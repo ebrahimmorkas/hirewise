@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, UpdateView
+from django.views.generic import CreateView, DetailView, TemplateView, UpdateView
 
 from apps.accounts.mixins import EmployerRequiredMixin
 
+from .analytics import company_analytics
 from .forms import CompanyForm
 from .models import Company
 
@@ -36,7 +37,8 @@ class CompanyUpdateView(EmployerRequiredMixin, UpdateView):
         return self.request.user.company
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not hasattr(request.user, "company"):
+        user = request.user
+        if user.is_authenticated and user.is_employer and not hasattr(user, "company"):
             return redirect("companies:create")
         return super().dispatch(request, *args, **kwargs)
 
@@ -56,3 +58,16 @@ class CompanyDetailView(DetailView):
             self.object.jobs.published().prefetch_related("skills").order_by("-published_at")
         )
         return context
+
+
+class AnalyticsView(EmployerRequiredMixin, TemplateView):
+    template_name = "companies/analytics.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated and user.is_employer and not hasattr(user, "company"):
+            return redirect("companies:create")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(stats=company_analytics(self.request.user.company))
