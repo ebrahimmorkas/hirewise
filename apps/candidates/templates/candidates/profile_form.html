@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}My profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>My profile</h1>
+  <div style="min-width:220px">
+    <p class="muted">Profile {{ object.completeness }}% complete</p>
+    <progress value="{{ object.completeness }}" max="100" style="width:100%"></progress>
+  </div>
+</div>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+    {{ form.as_div }}
+    {% if object.resume %}<p class="muted">A resume is on file. Upload a new PDF to replace it.</p>{% endif %}
+    <div><button class="btn" type="submit">Save profile</button></div>
+  </form>
+</div>
+{% endblock %}
