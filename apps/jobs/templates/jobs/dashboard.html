@@ -11,19 +11,17 @@
   <a class="btn" href="{% url 'jobs:create' %}">Post a job</a>
 </div>
 
-{% block dashboard_stats %}{% endblock %}
-
 {% if jobs %}
 <div class="card">
   <table class="table">
-    <thead><tr><th>Job</th><th>Status</th><th>Views</th>{% block extra_headers %}{% endblock %}<th></th></tr></thead>
+    <thead><tr><th>Job</th><th>Status</th><th>Views</th><th>Applicants</th><th></th></tr></thead>
     <tbody>
       {% for job in jobs %}
         <tr>
           <td><a href="{{ job.get_absolute_url }}">{{ job.title }}</a><div class="muted">{{ job.get_workplace_display }} · {{ job.get_level_display }}</div></td>
           <td><span class="badge badge--{{ job.status }}">{{ job.get_status_display }}</span></td>
           <td>{{ job.view_count }}</td>
-          {% block extra_cells %}{% endblock %}
+          <td><a href="{% url 'applications:pipeline' job.slug %}">{{ job.applicant_count }}</a>{% if job.new_count %} <span class="badge">{{ job.new_count }} new</span>{% endif %}</td>
           <td>
             <a href="{% url 'jobs:edit' job.slug %}">Edit</a>
             {% if job.status == "published" %}

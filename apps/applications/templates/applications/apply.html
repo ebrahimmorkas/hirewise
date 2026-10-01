@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Apply: {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Apply for {{ job.title }}</h1>
+    <p class="muted">{{ job.company.name }} &middot; {{ job.get_workplace_display }}{% if job.location %} · {{ job.location }}{% endif %}</p>
+  </div>
+</div>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.cover_letter.label_tag }} {{ form.cover_letter }}
+    <span class="helptext">{{ form.cover_letter.help_text }}</span>
+    {{ form.cover_letter.errors }}
+    {{ form.resume.label_tag }} {{ form.resume }}
+    <span class="helptext">{{ form.resume.help_text }}</span>
+    {{ form.resume.errors }}
+    <div><button class="btn" type="submit">Submit application</button></div>
+  </form>
+</div>
+{% endblock %}

@@ -13,8 +13,18 @@
     </p>
   </div>
   <div id="job-actions">
-    {% if user.is_authenticated and user.is_candidate %}{% include "jobs/_save_button.html" %}{% endif %}
+    {% if user.is_authenticated and user.is_candidate %}
+      {% include "jobs/_save_button.html" %}
+      {% if application %}
+        <a class="btn" href="{{ application.get_absolute_url }}">Applied &check; View status</a>
+      {% elif job.is_open %}
+        <a class="btn" href="{% url 'applications:apply' job.slug %}">Apply now</a>
+      {% endif %}
+    {% elif not user.is_authenticated and job.is_open %}
+      <a class="btn" href="{% url 'login' %}?next={% url 'applications:apply' job.slug %}">Log in to apply</a>
+    {% endif %}
     {% if is_owner %}
+      <a class="btn" href="{% url 'applications:pipeline' job.slug %}">Applicants</a>
       <a class="btn btn--ghost" href="{% url 'jobs:edit' job.slug %}">Edit</a>
     {% endif %}
   </div>
