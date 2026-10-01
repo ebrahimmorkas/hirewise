@@ -1,0 +1,11 @@
+Hi {{ alert.candidate.get_short_name }},
+
+New jobs matching "{{ alert.name }}":
+{% for job, url in jobs %}
+- {{ job.title }} at {{ job.company.name }}{% if job.salary_display %} ({{ job.salary_display }}){% endif %}
+  {{ job.get_workplace_display }}{% if job.location %} · {{ job.location }}{% endif %}
+  {{ url }}
+{% endfor %}
+Unsubscribe from this alert: {{ unsubscribe_url }}
+
+HireWise

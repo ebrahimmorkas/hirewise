@@ -1,0 +1,15 @@
+Hi {{ application.candidate.get_short_name }},
+
+{% if application.status == "screening" %}Good news: {{ application.job.company.name }} is reviewing your application for {{ application.job.title }}.
+{% elif application.status == "interview" %}{{ application.job.company.name }} would like to interview you for {{ application.job.title }}!
+{% elif application.status == "offer" %}Congratulations! {{ application.job.company.name }} is preparing an offer for {{ application.job.title }}.
+{% elif application.status == "hired" %}Congratulations on your new role as {{ application.job.title }} at {{ application.job.company.name }}!
+{% elif application.status == "rejected" %}Thank you for your interest in {{ application.job.title }}. {{ application.job.company.name }} has decided not to move forward with your application this time.
+{% else %}Your application for {{ application.job.title }} is now: {{ application.get_status_display }}.
+{% endif %}{% if message %}
+Message from {{ application.job.company.name }}:
+{{ message }}
+{% endif %}
+View your application: {{ url }}
+
+HireWise

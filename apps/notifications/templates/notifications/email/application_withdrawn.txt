@@ -1,0 +1,5 @@
+{{ application.candidate.full_name }} has withdrawn their application for {{ application.job.title }}.
+
+Pipeline: {{ url }}
+
+HireWise

@@ -3,6 +3,7 @@
   {% if user.is_candidate %}
     <a href="{% url 'applications:mine' %}">Applications</a>
     <a href="{% url 'jobs:saved' %}">Saved</a>
+    <a href="{% url 'notifications:alerts' %}">Alerts</a>
     <a href="{% url 'candidates:profile' %}">Profile</a>
   {% endif %}
   {% if user.is_employer %}<a href="{% url 'jobs:dashboard' %}">Dashboard</a>{% endif %}

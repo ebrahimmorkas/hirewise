@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Unsubscribe{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:520px;margin:48px auto;text-align:center">
+  {% if not alert %}
+    <h1>Link not valid</h1>
+    <p class="muted">This unsubscribe link is invalid or the alert no longer exists.</p>
+  {% elif done %}
+    <h1>Unsubscribed</h1>
+    <p class="muted">You will no longer receive emails for "{{ alert.name }}".</p>
+  {% else %}
+    <h1>Stop this alert?</h1>
+    <p class="muted">"{{ alert.name }}"</p>
+    <form method="post">{% csrf_token %}<button class="btn" type="submit">Unsubscribe</button></form>
+  {% endif %}
+</div>
+{% endblock %}
