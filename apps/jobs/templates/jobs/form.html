@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit job{% else %}Post a job{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>{% if object %}Edit "{{ object.title }}"{% else %}Post a job{% endif %}</h1></div>
+<div class="card">
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {{ form.as_div }}
+    <div>
+      {% if object %}
+        <button class="btn" type="submit">Save changes</button>
+      {% else %}
+        <button class="btn" type="submit" name="publish" value="1">Publish now</button>
+        <button class="btn btn--ghost" type="submit">Save as draft</button>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

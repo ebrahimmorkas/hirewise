@@ -7,4 +7,9 @@
   <h1>Find work that <em>fits</em>.</h1>
   <p class="muted">Search jobs from companies that are hiring now, apply in a click and track every application.</p>
 </section>
+
+<div class="page-header"><h2>Latest jobs</h2></div>
+<div class="job-list">
+  {% for job in latest_jobs %}{% include "jobs/_job_card.html" %}{% empty %}<p class="empty">No jobs posted yet.</p>{% endfor %}
+</div>
 {% endblock %}
