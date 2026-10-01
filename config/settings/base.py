@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     # local
     "apps.core",
     "apps.accounts",
+    "apps.companies",
+    "apps.jobs",
 ]
 
 MIDDLEWARE = [
@@ -109,6 +111,9 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+
+# --- Job board rules ---------------------------------------------------------------
+HIREWISE_JOB_LIFETIME_DAYS = env.int("HIREWISE_JOB_LIFETIME_DAYS", default=30)
 
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")

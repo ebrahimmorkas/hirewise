@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ company.name }}</h1>
+    {% if company.tagline %}<p class="muted">{{ company.tagline }}</p>{% endif %}
+  </div>
+  {% if company.website %}<a class="btn btn--ghost" href="{{ company.website }}" rel="noopener" target="_blank">Website</a>{% endif %}
+</div>
+
+<div class="card">
+  <p class="muted">
+    {% if company.headquarters %}{{ company.headquarters }}{% endif %}
+    {% if company.size %} &middot; {{ company.get_size_display }}{% endif %}
+  </p>
+  <p class="prose">{{ company.about }}</p>
+</div>
+
+<div class="page-header"><h2>Open positions ({{ jobs|length }})</h2></div>
+<div class="job-list">
+  {% for job in jobs %}{% include "jobs/_job_card.html" %}{% empty %}<p class="empty">No open positions right now.</p>{% endfor %}
+</div>
+{% endblock %}

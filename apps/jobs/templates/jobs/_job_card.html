@@ -1,0 +1,22 @@
+{% load humanize %}
+<article class="card job-card">
+  <div class="job-card__logo"{% if job.company.logo %} style="background-image:url('{{ job.company.logo.url }}')"{% endif %}>
+    {% if not job.company.logo %}{{ job.company.initials }}{% endif %}
+  </div>
+  <div>
+    <a class="job-card__title" href="{{ job.get_absolute_url }}">{{ job.title }}</a>
+    <div class="job-card__meta">
+      <a href="{{ job.company.get_absolute_url }}">{{ job.company.name }}</a>
+      <span>{{ job.get_workplace_display }}{% if job.location %} · {{ job.location }}{% endif %}</span>
+      <span>{{ job.get_employment_type_display }}</span>
+      <span>{{ job.get_level_display }}</span>
+    </div>
+    <div class="tags">
+      {% for skill in job.skills.all %}<span class="tag{% if skill.pk in matched_skill_ids %} tag--match{% endif %}">{{ skill.name }}</span>{% endfor %}
+    </div>
+  </div>
+  <div style="text-align:right">
+    {% if job.salary_display %}<div class="salary">{{ job.salary_display }}</div>{% endif %}
+    {% if job.published_at %}<div class="muted">{{ job.published_at|naturaltime }}</div>{% endif %}
+  </div>
+</article>

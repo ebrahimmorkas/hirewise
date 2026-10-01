@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Employer dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ user.company.name }}</h1>
+    <p class="muted"><a href="{{ user.company.get_absolute_url }}">Public profile</a> · <a href="{% url 'companies:edit' %}">Edit company</a></p>
+  </div>
+  <a class="btn" href="{% url 'jobs:create' %}">Post a job</a>
+</div>
+
+{% block dashboard_stats %}{% endblock %}
+
+{% if jobs %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Job</th><th>Status</th><th>Views</th>{% block extra_headers %}{% endblock %}<th></th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+        <tr>
+          <td><a href="{{ job.get_absolute_url }}">{{ job.title }}</a><div class="muted">{{ job.get_workplace_display }} · {{ job.get_level_display }}</div></td>
+          <td><span class="badge badge--{{ job.status }}">{{ job.get_status_display }}</span></td>
+          <td>{{ job.view_count }}</td>
+          {% block extra_cells %}{% endblock %}
+          <td>
+            <a href="{% url 'jobs:edit' job.slug %}">Edit</a>
+            {% if job.status == "published" %}
+              <form method="post" action="{% url 'jobs:status' job.slug 'close' %}" class="inline">{% csrf_token %}<button class="link" type="submit">Close</button></form>
+            {% else %}
+              <form method="post" action="{% url 'jobs:status' job.slug 'publish' %}" class="inline">{% csrf_token %}<button class="link" type="submit">Publish</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">No jobs yet. <a href="{% url 'jobs:create' %}">Post your first job</a>.</p>
+{% endif %}
+{% endblock %}
