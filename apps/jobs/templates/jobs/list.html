@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Find jobs{% endblock %}
+
+{% block content %}
+<div class="layout">
+  <aside class="sidebar card">
+    <form method="get" class="form" id="job-filters"
+          hx-get="{% url 'jobs:list' %}" hx-target="#results" hx-swap="outerHTML" hx-push-url="true"
+          hx-trigger="change, keyup changed delay:400ms from:input[type=text], submit">
+      {{ filter.form.as_div }}
+      <noscript><button class="btn" type="submit">Apply filters</button></noscript>
+      <a href="{% url 'jobs:list' %}" class="muted">Clear all</a>
+    </form>
+  </aside>
+  <section>
+    {% include "jobs/_results.html" %}
+  </section>
+</div>
+{% endblock %}

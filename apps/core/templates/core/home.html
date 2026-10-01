@@ -6,6 +6,11 @@
 <section class="hero">
   <h1>Find work that <em>fits</em>.</h1>
   <p class="muted">Search jobs from companies that are hiring now, apply in a click and track every application.</p>
+  <form class="filters" style="justify-content:center;margin-top:20px" method="get" action="{% url 'jobs:list' %}">
+    <input type="search" name="q" placeholder="Job title, skill or company" style="min-width:320px">
+    <input type="text" name="location" placeholder="Location">
+    <button class="btn" type="submit">Search jobs</button>
+  </form>
 </section>
 
 <div class="page-header"><h2>Latest jobs</h2></div>
