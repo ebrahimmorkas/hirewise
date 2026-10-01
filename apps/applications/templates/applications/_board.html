@@ -1,0 +1,37 @@
+<div id="board">
+  <div class="board">
+    {% for column in columns %}
+      <div class="board__column">
+        <h3>{{ column.label }} <span class="muted">{{ column.items|length }}</span></h3>
+        {% for application in column.items %}
+          <div class="board__card">
+            <a href="{{ application.get_absolute_url }}"><strong>{{ application.candidate.full_name }}</strong></a>
+            <div class="muted">{{ application.created_at|timesince }} ago</div>
+            {% if application.allowed_transitions %}
+              <form hx-post="{% url 'applications:status' application.pk %}" hx-target="#board" hx-swap="outerHTML" hx-trigger="change">
+                <input type="hidden" name="from" value="board">
+                <select name="status" aria-label="Move {{ application.candidate.full_name }}">
+                  <option value="">Move to…</option>
+                  {% for status in application.allowed_transitions %}<option value="{{ status }}">{{ status|capfirst }}</option>{% endfor %}
+                </select>
+              </form>
+            {% endif %}
+          </div>
+        {% empty %}
+          <p class="muted">—</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if rejected %}
+    <details class="card" style="margin-top:16px">
+      <summary>Rejected / withdrawn ({{ rejected|length }})</summary>
+      <ul>
+        {% for application in rejected %}
+          <li><a href="{{ application.get_absolute_url }}">{{ application.candidate.full_name }}</a> · {{ application.get_status_display }}</li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endif %}
+</div>

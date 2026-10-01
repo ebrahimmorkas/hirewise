@@ -1,6 +1,7 @@
 <a href="{% url 'jobs:list' %}">Find jobs</a>
 {% if user.is_authenticated %}
   {% if user.is_candidate %}
+    <a href="{% url 'applications:mine' %}">Applications</a>
     <a href="{% url 'jobs:saved' %}">Saved</a>
     <a href="{% url 'candidates:profile' %}">Profile</a>
   {% endif %}

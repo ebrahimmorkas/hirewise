@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}My applications{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>My applications</h1></div>
+{% if applications %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Role</th><th>Company</th><th>Status</th><th>Applied</th></tr></thead>
+    <tbody>
+      {% for application in applications %}
+        <tr>
+          <td><a href="{{ application.get_absolute_url }}">{{ application.job.title }}</a></td>
+          <td>{{ application.job.company.name }}</td>
+          <td><span class="badge badge--{{ application.status }}">{{ application.get_status_display }}</span></td>
+          <td>{{ application.created_at|date:"M j, Y" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">No applications yet. <a href="{% url 'jobs:list' %}">Find your next role</a>.</p>
+{% endif %}
+{% endblock %}

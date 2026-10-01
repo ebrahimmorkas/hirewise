@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Application: {{ application.job.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{% if is_employer %}{{ application.candidate.full_name }}{% else %}{{ application.job.title }}{% endif %}</h1>
+    <p class="muted">
+      {% if is_employer %}Applied for <a href="{{ application.job.get_absolute_url }}">{{ application.job.title }}</a>
+      &middot; <a href="{% url 'applications:pipeline' application.job.slug %}">Back to pipeline</a>
+      {% else %}{{ application.job.company.name }}{% endif %}
+      &middot; {{ application.created_at|date:"M j, Y" }}
+    </p>
+  </div>
+  <span class="badge badge--{{ application.status }}">{{ application.get_status_display }}</span>
+</div>
+
+<div class="layout">
+  <aside class="card">
+    <p><a class="btn btn--ghost btn--small" href="{% url 'applications:resume' application.pk %}">Download resume</a></p>
+
+    {% if is_employer %}
+      {% if profile %}
+        <h3>{{ profile.headline|default:"Candidate" }}</h3>
+        <p class="muted">{{ profile.location }}{% if profile.years_experience is not None %} · {{ profile.years_experience }} yrs experience{% endif %}</p>
+        <div class="tags">{% for skill in profile.skills.all %}<span class="tag">{{ skill.name }}</span>{% endfor %}</div>
+        <p>
+          {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" rel="noopener" target="_blank">LinkedIn</a>{% endif %}
+          {% if profile.github_url %} · <a href="{{ profile.github_url }}" rel="noopener" target="_blank">GitHub</a>{% endif %}
+        </p>
+      {% endif %}
+
+      {% if application.allowed_transitions %}
+        <h3>Move to</h3>
+        <form method="post" action="{% url 'applications:status' application.pk %}" class="form">
+          {% csrf_token %}
+          <select name="status">
+            {% for status in application.allowed_transitions %}<option value="{{ status }}">{{ status|capfirst }}</option>{% endfor %}
+          </select>
+          <textarea name="note" rows="2" placeholder="Message to the candidate (optional)"></textarea>
+          <button class="btn btn--small" type="submit">Update status</button>
+        </form>
+      {% endif %}
+    {% elif application.is_active %}
+      <form method="post" action="{% url 'applications:status' application.pk %}">
+        {% csrf_token %}<input type="hidden" name="status" value="withdrawn">
+        <button class="btn btn--ghost btn--small" type="submit">Withdraw application</button>
+      </form>
+    {% endif %}
+  </aside>
+
+  <section>
+    {% if application.cover_letter %}
+      <div class="card"><h3>Cover letter</h3><div class="prose">{{ application.cover_letter }}</div></div>
+    {% endif %}
+
+    <div class="card" style="margin-top:16px">
+      <h3>Timeline</h3>
+      <ul class="timeline">
+        {% for event in events %}
+          <li>
+            <strong>
+              {% if event.to_status and not event.from_status %}Application submitted
+              {% elif event.to_status %}{{ event.from_status|capfirst }} → {{ event.to_status|capfirst }}
+              {% else %}Internal note{% endif %}
+            </strong>
+            <span class="muted"> · {{ event.created_at|date:"M j, H:i" }}{% if is_employer and event.actor %} · {{ event.actor.full_name }}{% endif %}</span>
+            {% if event.note %}<div class="prose">{{ event.note }}</div>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if is_employer %}
+        <form method="post" action="{% url 'applications:note' application.pk %}" class="form">
+          {% csrf_token %}{{ note_form.note }}
+          <button class="btn btn--small btn--ghost" type="submit">Add internal note</button>
+        </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

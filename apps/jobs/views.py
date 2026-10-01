@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import F
+from django.db.models import Count, F, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -95,7 +95,17 @@ class EmployerDashboardView(CompanyRequiredMixin, ListView):
     context_object_name = "jobs"
 
     def get_queryset(self):
-        return super().get_queryset().order_by("-created_at")
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                applicant_count=Count("applications", distinct=True),
+                new_count=Count(
+                    "applications", filter=Q(applications__status="applied"), distinct=True
+                ),
+            )
+            .order_by("-created_at")
+        )
 
 
 class JobCreateView(CompanyRequiredMixin, CreateView):
@@ -167,4 +177,10 @@ class JobDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["is_owner"] = self.is_owner
         context["is_saved"] = self.object.pk in saved_job_ids(self.request.user)
+        user = self.request.user
+        context["application"] = (
+            self.object.applications.filter(candidate=user).first()
+            if user.is_authenticated and user.is_candidate
+            else None
+        )
         return context
