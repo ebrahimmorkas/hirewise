@@ -1,14 +1,79 @@
 from django.contrib import messages
 from django.db.models import F
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from apps.accounts.mixins import EmployerRequiredMixin
+from apps.accounts.mixins import CandidateRequiredMixin, EmployerRequiredMixin
 
+from .filters import JobFilter
 from .forms import JobForm
-from .models import Job
+from .models import Job, SavedJob
+
+
+def saved_job_ids(user) -> set[int]:
+    if user.is_authenticated and user.is_candidate:
+        return set(user.saved_jobs.values_list("job_id", flat=True))
+    return set()
+
+
+class JobListView(ListView):
+    """Public job search. HTMX requests receive only the results fragment."""
+
+    template_name = "jobs/list.html"
+    context_object_name = "jobs"
+    paginate_by = 15
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return ["jobs/_results.html"]
+        return [self.template_name]
+
+    def get_queryset(self):
+        base = Job.objects.published().select_related("company").prefetch_related("skills")
+        self.filterset = JobFilter(self.request.GET or None, queryset=base)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.copy()
+        query.pop("page", None)
+        context.update(
+            filter=self.filterset,
+            querystring=query.urlencode(),
+            saved_job_ids=saved_job_ids(self.request.user),
+        )
+        return context
+
+
+class ToggleSaveJobView(CandidateRequiredMixin, View):
+    def post(self, request, slug):
+        job = get_object_or_404(Job, slug=slug)
+        saved, created = SavedJob.objects.get_or_create(candidate=request.user, job=job)
+        if not created:
+            saved.delete()
+        if request.headers.get("HX-Request"):
+            return render(request, "jobs/_save_button.html", {"job": job, "is_saved": created})
+        return redirect(job)
+
+
+class SavedJobsView(CandidateRequiredMixin, ListView):
+    template_name = "jobs/saved.html"
+    context_object_name = "jobs"
+
+    def get_queryset(self):
+        return (
+            Job.objects.filter(saves__candidate=self.request.user)
+            .select_related("company")
+            .prefetch_related("skills")
+            .order_by("-saves__created_at")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["saved_job_ids"] = {job.pk for job in context["jobs"]}
+        return context
 
 
 class CompanyRequiredMixin(EmployerRequiredMixin):
@@ -101,4 +166,5 @@ class JobDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["is_owner"] = self.is_owner
+        context["is_saved"] = self.object.pk in saved_job_ids(self.request.user)
         return context

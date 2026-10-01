@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Saved jobs{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>Saved jobs</h1></div>
+<div class="job-list">
+  {% for job in jobs %}{% include "jobs/_job_card.html" %}{% empty %}<p class="empty">You haven't saved any jobs yet. <a href="{% url 'jobs:list' %}">Start searching</a>.</p>{% endfor %}
+</div>
+{% endblock %}

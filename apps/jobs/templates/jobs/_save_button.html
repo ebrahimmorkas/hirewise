@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'jobs:save' job.slug %}" class="inline"
+      hx-post="{% url 'jobs:save' job.slug %}" hx-swap="outerHTML">
+  {% csrf_token %}
+  <button class="btn btn--ghost btn--small" type="submit">{% if is_saved %}&#9733; Saved{% else %}&#9734; Save{% endif %}</button>
+</form>

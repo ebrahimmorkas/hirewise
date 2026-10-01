@@ -5,6 +5,8 @@ from . import views
 app_name = "jobs"
 
 urlpatterns = [
+    path("", views.JobListView.as_view(), name="list"),
+    path("saved/", views.SavedJobsView.as_view(), name="saved"),
     path("employer/", views.EmployerDashboardView.as_view(), name="dashboard"),
     path("employer/new/", views.JobCreateView.as_view(), name="create"),
     path("employer/<slug:slug>/edit/", views.JobUpdateView.as_view(), name="edit"),
@@ -14,4 +16,5 @@ urlpatterns = [
         name="status",
     ),
     path("<slug:slug>/", views.JobDetailView.as_view(), name="detail"),
+    path("<slug:slug>/save/", views.ToggleSaveJobView.as_view(), name="save"),
 ]

@@ -18,5 +18,6 @@
   <div style="text-align:right">
     {% if job.salary_display %}<div class="salary">{{ job.salary_display }}</div>{% endif %}
     {% if job.published_at %}<div class="muted">{{ job.published_at|naturaltime }}</div>{% endif %}
+    {% if job.pk in saved_job_ids %}<div class="badge">&#9733; Saved</div>{% endif %}
   </div>
 </article>

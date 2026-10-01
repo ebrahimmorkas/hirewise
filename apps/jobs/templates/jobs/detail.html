@@ -13,7 +13,7 @@
     </p>
   </div>
   <div id="job-actions">
-    {% block job_actions %}{% endblock %}
+    {% if user.is_authenticated and user.is_candidate %}{% include "jobs/_save_button.html" %}{% endif %}
     {% if is_owner %}
       <a class="btn btn--ghost" href="{% url 'jobs:edit' job.slug %}">Edit</a>
     {% endif %}
