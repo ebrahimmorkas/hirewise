@@ -1,0 +1,8 @@
+{{ application.candidate.full_name }} applied for {{ application.job.title }}.
+{% if application.cover_letter %}
+Cover letter:
+{{ application.cover_letter|truncatewords:120 }}
+{% endif %}
+Review the application: {{ url }}
+
+HireWise
