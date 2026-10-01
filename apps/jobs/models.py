@@ -137,3 +137,20 @@ class Job(TimeStampedModel):
         if self.salary_min:
             return f"{self.salary_currency} {fmt(self.salary_min)}+"
         return f"up to {self.salary_currency} {fmt(self.salary_max)}"
+
+
+class SavedJob(models.Model):
+    candidate = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_jobs"
+    )
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="saves")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["candidate", "job"], name="unique_saved_job"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.candidate} saved {self.job}"

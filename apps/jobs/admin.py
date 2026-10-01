@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Job, Skill
+from .models import Job, SavedJob, Skill
 
 
 @admin.register(Skill)
@@ -25,3 +25,9 @@ class JobAdmin(admin.ModelAdmin):
     autocomplete_fields = ["skills"]
     list_select_related = ["company"]
     date_hierarchy = "published_at"
+
+
+@admin.register(SavedJob)
+class SavedJobAdmin(admin.ModelAdmin):
+    list_display = ["candidate", "job", "created_at"]
+    list_select_related = ["candidate", "job"]
