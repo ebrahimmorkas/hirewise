@@ -1,5 +1,15 @@
 <div id="results">
-  <p class="muted">{{ paginator.count|default:0 }} job{{ paginator.count|pluralize }} found</p>
+  <div class="page-header" style="margin:0 0 12px">
+    <p class="muted" style="margin:0">{{ paginator.count|default:0 }} job{{ paginator.count|pluralize }} found</p>
+    {% if user.is_authenticated and user.is_candidate %}
+      <form method="post" action="{% url 'notifications:create' %}" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="query" value="{{ querystring }}">
+        <select name="frequency" aria-label="Alert frequency"><option value="daily">Daily</option><option value="weekly">Weekly</option></select>
+        <button class="btn btn--ghost btn--small" type="submit">&#128276; Email me new matches</button>
+      </form>
+    {% endif %}
+  </div>
   <div class="job-list">
     {% for job in jobs %}
       {% include "jobs/_job_card.html" %}
