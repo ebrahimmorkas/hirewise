@@ -10,6 +10,7 @@ from apps.accounts.mixins import CandidateRequiredMixin, EmployerRequiredMixin
 from .filters import JobFilter
 from .forms import JobForm
 from .models import Job, SavedJob
+from .recommendations import candidate_skill_ids, recommended_jobs
 
 
 def saved_job_ids(user) -> set[int]:
@@ -43,6 +44,7 @@ class JobListView(ListView):
             filter=self.filterset,
             querystring=query.urlencode(),
             saved_job_ids=saved_job_ids(self.request.user),
+            matched_skill_ids=candidate_skill_ids(self.request.user),
         )
         return context
 
@@ -56,6 +58,20 @@ class ToggleSaveJobView(CandidateRequiredMixin, View):
         if request.headers.get("HX-Request"):
             return render(request, "jobs/_save_button.html", {"job": job, "is_saved": created})
         return redirect(job)
+
+
+class RecommendedJobsView(CandidateRequiredMixin, ListView):
+    template_name = "jobs/recommended.html"
+    context_object_name = "jobs"
+
+    def get_queryset(self):
+        return recommended_jobs(self.request.user, limit=20)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["matched_skill_ids"] = candidate_skill_ids(self.request.user)
+        context["saved_job_ids"] = saved_job_ids(self.request.user)
+        return context
 
 
 class SavedJobsView(CandidateRequiredMixin, ListView):
@@ -177,6 +193,7 @@ class JobDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["is_owner"] = self.is_owner
         context["is_saved"] = self.object.pk in saved_job_ids(self.request.user)
+        context["matched_skill_ids"] = candidate_skill_ids(self.request.user)
         user = self.request.user
         context["application"] = (
             self.object.applications.filter(candidate=user).first()

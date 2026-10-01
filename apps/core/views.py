@@ -7,6 +7,7 @@ from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView
 
 from apps.jobs.models import Job
+from apps.jobs.recommendations import candidate_skill_ids, recommended_jobs
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,10 @@ class HomeView(TemplateView):
         context["latest_jobs"] = (
             Job.objects.published().select_related("company").prefetch_related("skills")[:6]
         )
+        user = self.request.user
+        if user.is_authenticated and user.is_candidate:
+            context["recommended"] = recommended_jobs(user, limit=3)
+            context["matched_skill_ids"] = candidate_skill_ids(user)
         return context
 
 

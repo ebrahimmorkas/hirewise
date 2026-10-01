@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Recommended jobs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Recommended for you</h1>
+    <p class="muted">Based on the skills in <a href="{% url 'candidates:profile' %}">your profile</a>. Matching skills are highlighted.</p>
+  </div>
+</div>
+<div class="job-list">
+  {% for job in jobs %}
+    <div>
+      <p class="muted" style="margin:0 0 4px"><strong>{{ job.match_count }}</strong> matching skill{{ job.match_count|pluralize }} · {{ job.match_percent|floatformat:0 }}% of requirements</p>
+      {% include "jobs/_job_card.html" %}
+    </div>
+  {% empty %}
+    <p class="empty">No recommendations yet. <a href="{% url 'candidates:profile' %}">Add skills to your profile</a> to get matched with jobs.</p>
+  {% endfor %}
+</div>
+{% endblock %}
