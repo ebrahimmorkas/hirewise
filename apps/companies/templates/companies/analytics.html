@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Hiring analytics{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Hiring analytics</h1>
+    <p class="muted"><a href="{% url 'jobs:dashboard' %}">&larr; Dashboard</a> · updated {{ stats.generated_at|naturaltime }}</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat__value">{{ stats.open_jobs }}</div><div class="stat__label">Open jobs ({{ stats.total_jobs }} total)</div></div>
+  <div class="stat"><div class="stat__value">{{ stats.total_views|intcomma }}</div><div class="stat__label">Job views</div></div>
+  <div class="stat"><div class="stat__value">{{ stats.total_applications|intcomma }}</div><div class="stat__label">Applications</div></div>
+  <div class="stat"><div class="stat__value">{{ stats.conversion_rate }}%</div><div class="stat__label">View → apply conversion</div></div>
+  <div class="stat"><div class="stat__value">{{ stats.hired }}</div><div class="stat__label">Hires</div></div>
+</div>
+
+<div class="layout" style="grid-template-columns:1fr 1fr">
+  <section class="card">
+    <h2>Pipeline funnel</h2>
+    {% for step in stats.funnel %}
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between"><span>{{ step.stage }}</span><span class="muted">{{ step.count }} · {{ step.percent }}%</span></div>
+        <div style="background:#eef2f7;border-radius:6px;height:10px"><div style="width:{{ step.percent }}%;background:var(--primary);height:10px;border-radius:6px"></div></div>
+      </div>
+    {% endfor %}
+  </section>
+
+  <section class="card">
+    <h2>Applications, last 30 days</h2>
+    <div style="display:flex;align-items:flex-end;gap:3px;height:140px" role="img" aria-label="Daily applications chart">
+      {% for point in stats.trend %}
+        <div title="{{ point.day|date:'M j' }}: {{ point.count }}" style="flex:1;background:var(--primary);opacity:.85;border-radius:3px 3px 0 0;height:{{ point.height }}%;min-height:2px"></div>
+      {% endfor %}
+    </div>
+    <p class="muted" style="display:flex;justify-content:space-between"><span>{{ stats.trend.0.day|date:"M j" }}</span><span>Today</span></p>
+  </section>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <h2>Top jobs</h2>
+  <table class="table">
+    <thead><tr><th>Job</th><th>Views</th><th>Applicants</th></tr></thead>
+    <tbody>
+      {% for job in stats.top_jobs %}
+        <tr><td><a href="{% url 'applications:pipeline' job.slug %}">{{ job.title }}</a></td><td>{{ job.view_count }}</td><td>{{ job.applicant_count }}</td></tr>
+      {% empty %}
+        <tr><td colspan="3" class="muted">No jobs yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

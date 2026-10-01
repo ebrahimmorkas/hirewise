@@ -1,12 +1,16 @@
 <a href="{% url 'jobs:list' %}">Find jobs</a>
 {% if user.is_authenticated %}
   {% if user.is_candidate %}
+    <a href="{% url 'jobs:recommended' %}">For you</a>
     <a href="{% url 'applications:mine' %}">Applications</a>
     <a href="{% url 'jobs:saved' %}">Saved</a>
     <a href="{% url 'notifications:alerts' %}">Alerts</a>
     <a href="{% url 'candidates:profile' %}">Profile</a>
   {% endif %}
-  {% if user.is_employer %}<a href="{% url 'jobs:dashboard' %}">Dashboard</a>{% endif %}
+  {% if user.is_employer %}
+    <a href="{% url 'jobs:dashboard' %}">Dashboard</a>
+    <a href="{% url 'companies:analytics' %}">Analytics</a>
+  {% endif %}
   <span class="muted">{{ user.get_short_name }}</span>
   <form method="post" action="{% url 'logout' %}" class="inline">
     {% csrf_token %}<button class="link" type="submit">Log out</button>
